@@ -1,16 +1,30 @@
 Structured Queury Language:
 - the way we communicate to databases
 - uses clauses to create a statement
+- sql keywords are not case sensitive; SELECT & select is the same
 
-Basic Concepts in SQL:
+Basic Concepts (COMMANDS) in SQL:
 - SELECT -> choose columns to display
+- UPDATE -> updates data in a database
+- DELETE -> deletes data from a database
 - FROM -> choose table where you're looking at
 - WHERE -> filter data (rows)
 - GROUP BY -> allows you to group your data's in rows
 - HAVING BY -> filter GROUPED rows (NOT RAW datas)
 - ORDER BY -> allows you to sort your data
 
-ADDITIONAL
+ADDITIONAL:
+- INSERT INTO -> inserts new data into a database
+- CREATE DATABASE -> creates a new database
+- ALTER DATABASE -> modify changes in a database
+- CREATE TABLE -> add a new table
+- ALTER TABLE -> allows modification in a table
+- DROP TABLE -> deletes entire table
+- CREATE INDEX -> makes a search key (index) 
+- DROP INDEX -> deletes a search key
 - LIMIT -> allows you to put a specific number of data that will be displayed
 - COUNT -> number of data's that meets the condition specified
 - DISTINCT -> allows you to view a unique value (distinct)
+
+Syntax:
+- some requires the use of semicolon at the end of each sql statement

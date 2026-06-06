@@ -15,7 +15,7 @@
   - security built-in -> keeps your applications protected; password bashing, authentication, and such
   - dependency injection -> provides libraries your codes need 
 
-# REST (representatinal state transfer) API:
+# REST (representational state transfer) API:
   - communication between frontend and backend using HTTP methods
   - 4 MAIN HTTP METHODS: 
   - 1. Post - create (/api/expenses) - add new expenses

@@ -21,34 +21,70 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
 - **Task:** Take notes on concepts you learn
 - **Deliverable:** None yet (learning phase)
 
-### **June 3-4 (Wednesday-Thursday): Database & JPA Basics**
-- **Learning Goal:** Understand how data is stored and retrieved
+### **June 3-4 (Wednesday-Thursday): Database & JPA Basics + Practical Setup**
+- **Learning Goal:** Understand how data is stored and retrieved + hands-on database configuration
 - **Topics:**
   - Relational databases (tables, primary keys, relationships)
   - SQL basics (SELECT, INSERT, UPDATE, DELETE)
   - JPA/Hibernate (Object-Relational Mapping)
   - Entity relationships (One-to-Many, Many-to-One)
+  - **NEW: Spring Boot application.properties configuration**
+  - **NEW: Database connection setup (PostgreSQL or H2)**
+  - **NEW: JPA validation annotations (@NotNull, @Positive, @NotBlank, etc.)**
+  - **NEW: Cascading operations and fetch types (LAZY vs EAGER)**
+  - **NEW: Custom JPA queries for budget tracker features**
+  - **NEW: LocalDate/LocalDateTime handling in entities**
+  - **NEW: Testing entities with repositories**
+
 - **Time:** 2-3 hours/day
 - **Resources:**
   - JPA Tutorial (Baeldung)
   - SQL Practice (W3Schools SQL)
-- **Task:** Write simple SQL queries, understand JPA annotations
-- **Deliverable:** None yet (learning phase)
+  - Spring Data JPA Documentation
+  - PostgreSQL or H2 setup guides
+  - Validation annotations guide (javax.validation)
+
+- **Tasks:**
+
+  **Day 1 (June 3):**
+  1. Review SQL basics and JPA concepts
+  2. Install PostgreSQL locally OR decide to use H2 (simpler for starting)
+  3. Learn Spring Boot `application.properties` configuration
+  4. Understand cascading and fetch types
+  5. Learn validation annotations and when to use them
+  6. Watch tutorial on database setup with Spring Boot
+
+  **Day 2 (June 4):**
+  1. Practice writing custom JPA queries:
+     - Find all expenses for a user between two dates
+     - Find total amount spent in a category
+     - Find expenses exceeding a certain amount
+  2. Learn LocalDate handling in entity fields
+  3. Create sample User and Expense entities locally (test with H2 or PostgreSQL)
+  4. Write simple test to verify entities save correctly to database
+  5. Test repository query methods
+
+- **Deliverable:** Understanding of practical database setup + sample tested entities (no Spring Boot app yet)
 
 ### **June 5-7 (Friday-Sunday): Project Setup & First Endpoint**
 - **Learning Goal:** Set up your development environment and create first API
 - **Tasks:**
   1. Install JDK 17+ (if not already)
-  2. Install IntelliJ IDEA Community Edition (free)
+  2. Install VS Code with Java extensions:
+     - **Extension Pack for Java** (by Microsoft)
+     - **Spring Boot Extension Pack** (by Pivotal/VMware)
+     - **Thunder Client** (for testing REST endpoints)
   3. Create Spring Boot project using Spring Initializr
   4. Set up PostgreSQL locally (or use H2 database for now)
   5. Create your first REST endpoint (GET /api/health)
-  6. Test with Postman
+  6. Test with Thunder Client
   7. Push to GitHub
 - **Time:** 3-4 hours/day
 - **Resources:**
   - Spring Initializr (start.spring.io)
   - Spring Boot Getting Started Guide
+  - VS Code Java Extension Pack Documentation
+  - Thunder Client Documentation
 - **Deliverable:** ✅ GitHub repo with working Spring Boot project + 1 endpoint
 
 ---
@@ -104,7 +140,7 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
   2. Build POST /api/expenses (create expense)
   3. Build GET /api/expenses (get all expenses for user)
   4. Build GET /api/expenses/{id} (get single expense)
-  5. Test all endpoints with Postman
+  5. Test all endpoints with Thunder Client
   6. Commit to GitHub
 - **Resources:**
   - Spring Web MVC Documentation
@@ -261,6 +297,24 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
 
 ---
 
+## **Development Environment Setup**
+
+### **IDE & Tools You'll Use:**
+
+**VS Code with Extensions:**
+- **Extension Pack for Java** (by Microsoft) - Complete Java support
+- **Spring Boot Extension Pack** (by Pivotal/VMware) - Spring Boot development tools
+- **Thunder Client** (by Rangav) - REST API testing (instead of Postman)
+
+**Why This Stack:**
+- ✅ Lightweight and fast
+- ✅ All-in-one in VS Code (no need for external tools)
+- ✅ Free and open source
+- ✅ Perfect for Spring Boot development
+- ✅ Thunder Client built-in = no context switching between apps
+
+---
+
 ## **Daily Routine Template**
 
 ### **Each Day (3-4 hours total):**
@@ -301,10 +355,14 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
 | Spring Security | https://spring.io/projects/spring-security |
 | Baeldung Tutorials | https://www.baeldung.com |
 | Spring Initializr | https://start.spring.io |
-| Postman | https://www.postman.com |
+| VS Code | https://code.visualstudio.com |
+| Extension Pack for Java | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack |
+| Spring Boot Extension Pack | https://marketplace.visualstudio.com/items?itemName=Pivotal.vscode-spring-boot |
+| Thunder Client | https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client |
 | PostgreSQL | https://www.postgresql.org |
 | Chart.js | https://www.chartjs.org |
 | Heroku Docs | https://devcenter.heroku.com |
+| Validation Annotations | https://www.baeldung.com/spring-valid-annotation |
 
 ---
 

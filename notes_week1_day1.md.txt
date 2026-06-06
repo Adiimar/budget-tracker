@@ -1,0 +1,29 @@
+# Why spring boot?
+  - it serves as a built-in toolkit for java developers in creating web development and applications
+  - no need to setup from scratch.
+  - big community so theres a lot of resources online
+  - fast development, with less boilerplate code (repetitive codes)
+  - good for microservice (small, focused services)
+  - easy to deploy
+
+
+# Features of Spring boot:
+  - auto-configuration -> is automatically setting up your applicaitons so that developers can focus on their business logic and codes
+  - embedded servers -> no need to install tomcat separately  (web-server) and can run up your app in single comment (java -jar app.jar)
+  - REST API creation -> are made easy, no complex configuration needed. (way of two applications to talk over the internet: HTTP METHODS)
+  - databae integration -> automatically handles database connections and convert java objects to databases tables (no complex SQL needed for basic operations)
+  - security built-in -> keeps your applications protected; password bashing, authentication, and such
+  - dependency injection -> provides libraries your codes need 
+
+# REST (representational state transfer) API:
+  - communication between frontend and backend using HTTP methods
+  - 4 MAIN HTTP METHODS: 
+  - 1. Post - create (/api/expenses) - add new expenses
+  - 2. GET - read (/api/expenses) - get all expenses
+  - 3. PUT - update (/api/expenses/5) - update expense 5
+  - 4. DELETE - delete (/api/expenses/5) - delete expense 5
+
+# MVC (model-view-controller) Patterns:
+  - Model -> represent the database such as expense, budget classes and informations
+  - View -> UI or frontend (what appears on the screen)
+  - Controller -> the manager where it receives requests from the view and processes data usin gthe     model; THE BRAIN THAT CONNECTS EVERYTHING

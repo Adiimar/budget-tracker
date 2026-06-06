@@ -21,16 +21,17 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
 - **Task:** Take notes on concepts you learn
 - **Deliverable:** None yet (learning phase)
 
-### **June 3-4 (Wednesday-Thursday): Database & JPA Basics + PostgreSQL Setup**
-- **Learning Goal:** Understand how data is stored and retrieved + hands-on database configuration with PostgreSQL
+### **June 3-4 (Wednesday-Thursday): Database & JPA Basics + PostgreSQL Setup in VS Code**
+- **Learning Goal:** Understand how data is stored and retrieved + hands-on database configuration with PostgreSQL in VS Code
 - **Topics:**
   - Relational databases (tables, primary keys, relationships)
   - SQL basics (SELECT, INSERT, UPDATE, DELETE)
   - JPA/Hibernate (Object-Relational Mapping)
   - Entity relationships (One-to-Many, Many-to-One)
   - **NEW: PostgreSQL installation and setup**
+  - **NEW: PostgreSQL integration with VS Code extensions**
   - **NEW: Spring Boot application.properties configuration for PostgreSQL**
-  - **NEW: Database connection setup and testing**
+  - **NEW: Database connection setup and testing in VS Code**
   - **NEW: JPA validation annotations (@NotNull, @Positive, @NotBlank, etc.)**
   - **NEW: Cascading operations and fetch types (LAZY vs EAGER)**
   - **NEW: Custom JPA queries for budget tracker features**
@@ -47,22 +48,29 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
 
 - **Tasks:**
 
-  **Day 1 (June 3): PostgreSQL Setup + JPA Concepts**
+  **Day 1 (June 3): PostgreSQL Setup in VS Code + JPA Concepts**
   
-  **Part A: PostgreSQL Installation & Setup (60-90 mins)**
+  **Part A: PostgreSQL Installation & VS Code Integration (60-90 mins)**
   1. Download PostgreSQL from https://www.postgresql.org/download/
-  2. Install PostgreSQL (Windows/Mac/Linux - follow installer defaults)
-  3. During installation, remember the password you set for `postgres` user
-  4. After installation, open PostgreSQL Command Line (psql) or use a GUI tool
-  5. Create your budget tracker database:
-     ```sql
-     CREATE DATABASE budget_tracker;
-     ```
-  6. Verify the database was created:
-     ```sql
-     \l
-     ```
-  7. Keep PostgreSQL running in background (it will start automatically on reboot)
+  2. Install PostgreSQL (Windows/Mac/Linux - follow installer defaults, remember the `postgres` password)
+  3. After installation, open VS Code
+  4. Install PostgreSQL VS Code extension:
+     - Open Extensions tab (Ctrl+Shift+X / Cmd+Shift+X)
+     - Search for "PostgreSQL" by Chris Kolkman
+     - Click Install
+  5. Open the PostgreSQL extension in VS Code (icon in left sidebar)
+  6. Click "Create Connection" or "+" button
+  7. Fill in connection details:
+     - Host: localhost
+     - Port: 5432
+     - User: postgres
+     - Password: [the password you set during installation]
+     - Database: postgres (initially)
+     - SSL: Standard (or None)
+  8. Test connection (you should see "✓ Connected")
+  9. Right-click on the connection → "Create Database"
+  10. Name it: `budget_tracker`
+  11. Verify database appears in the PostgreSQL explorer in VS Code
   
   **Part B: Learn JPA Concepts (60-90 mins)**
   1. Review SQL basics and JPA concepts from resources
@@ -84,7 +92,7 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
      spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
      ```
   3. Understand what each property does
-  4. Know how to test the connection
+  4. Know how to test the connection in Spring Boot
   
   **Part B: Practice JPA Queries & Entities (90 mins)**
   1. Practice writing custom JPA queries:
@@ -96,16 +104,17 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
   4. Understand validation annotations usage in your entities
   5. Know how to test repository query methods
 
-- **Deliverable:** ✅ PostgreSQL installed and working + Understanding of Spring Boot DB config + Sample entity classes
+- **Deliverable:** ✅ PostgreSQL installed and connected in VS Code + Understanding of Spring Boot DB config + Sample entity classes
 
 ### **June 5-7 (Friday-Sunday): Project Setup & First Endpoint**
 - **Learning Goal:** Set up your Spring Boot project in VS Code and create first API
 - **Tasks:**
   1. Install JDK 17+ (if not already)
-  2. Install VS Code with required extensions:
+  2. Install VS Code extensions (if not already done):
      - **Extension Pack for Java** (by Microsoft) - Search in Extensions tab, click Install
      - **Spring Boot Extension Pack** (by Pivotal/VMware) - Search in Extensions tab, click Install
-     - **Thunder Client** (by Rangav) - Search in Extensions tab, click Install
+     - **PostgreSQL** (by Chris Kolkman) - For managing your database
+     - **Thunder Client** (by Rangav) - For testing REST endpoints
      - **Lombok** (optional, but helpful) - Reduces boilerplate code
   3. Create Spring Boot project using Spring Initializr (https://start.spring.io):
      - Project: Maven
@@ -114,20 +123,38 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
      - Project Name: budget-tracker
      - Package Name: com.example.budgettracker
      - Dependencies: Spring Web, Spring Data JPA, PostgreSQL Driver, Validation
-  4. Download project and open in VS Code
-  5. Test that project opens correctly and build completes
-  6. Configure `application.properties` with PostgreSQL connection details (from June 4)
-  7. Create your first REST endpoint (GET /api/health)
-  8. Test with Thunder Client (Open Thunder Client in sidebar, create new request)
-  9. Push to GitHub with message: "Initial Spring Boot setup with PostgreSQL"
+  4. Download project and open in VS Code (File → Open Folder)
+  5. Wait for dependencies to download (check Maven icon in sidebar)
+  6. Open PostgreSQL explorer in VS Code and select your `budget_tracker` connection
+  7. Configure `application.properties` with PostgreSQL connection details:
+     ```properties
+     spring.datasource.url=jdbc:postgresql://localhost:5432/budget_tracker
+     spring.datasource.username=postgres
+     spring.datasource.password=YOUR_PASSWORD_HERE
+     spring.jpa.hibernate.ddl-auto=update
+     spring.jpa.show-sql=true
+     ```
+  8. Create your first REST endpoint (GET /api/health) in a new Controller class
+  9. Run Spring Boot app using Spring Boot Dashboard (bottom left in VS Code)
+  10. Check console for "Started BudgetTrackerApplication" message
+  11. Test with Thunder Client:
+      - Open Thunder Client in sidebar
+      - Create new request
+      - URL: http://localhost:8080/api/health
+      - Method: GET
+      - Click "Send"
+      - You should see 200 response with "ok" message
+  12. In VS Code PostgreSQL explorer, check that Spring Boot created tables (refresh connection)
+  13. Push to GitHub with message: "Initial Spring Boot setup with PostgreSQL in VS Code"
 - **Time:** 3-4 hours/day
 - **Resources:**
   - Spring Initializr (start.spring.io)
   - Spring Boot Getting Started Guide
   - VS Code Java Extension Pack Documentation
+  - PostgreSQL Extension for VS Code Documentation
   - Thunder Client Documentation
   - Spring Boot + PostgreSQL setup guide
-- **Deliverable:** ✅ GitHub repo with working Spring Boot project + 1 health check endpoint + PostgreSQL connected
+- **Deliverable:** ✅ GitHub repo with working Spring Boot project + 1 health check endpoint + PostgreSQL connected and visible in VS Code
 
 ---
 
@@ -147,11 +174,12 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
   3. Create UserRepository (JPA repository)
   4. Understand password encoding concepts
   5. Set up basic entity relationships
+  6. Use VS Code PostgreSQL explorer to view created tables
 - **Resources:**
   - Spring Security Official Docs
   - Baeldung: Spring Security Password Encoding
   - Entity design best practices
-- **Deliverable:** User entity + repository (no endpoints yet)
+- **Deliverable:** User entity + repository + visible in VS Code PostgreSQL explorer
 
 ### **June 10-11 (Wednesday-Thursday): Expense Model & Relationships**
 - **Learning Goal:** Design expense data model and connect to users
@@ -165,12 +193,13 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
   1. Create Expense entity class with validation
   2. Create ExpenseRepository with custom queries
   3. Set up One-to-Many relationship between User and Expense
-  4. Test JPA queries with Thunder Client or simple tests
+  4. Test JPA queries with Thunder Client
   5. Verify data persists to PostgreSQL
+  6. Query data directly in VS Code using PostgreSQL explorer
 - **Resources:**
   - JPA Relationships Guide (Baeldung)
   - Spring Data JPA Documentation
-- **Deliverable:** Expense entity + User-Expense relationship + verified in PostgreSQL
+- **Deliverable:** Expense entity + User-Expense relationship + verified in VS Code PostgreSQL explorer
 
 ### **June 12-14 (Friday-Sunday): Build CRUD Endpoints (Part 1)**
 - **Learning Goal:** Create basic API endpoints for expenses
@@ -186,13 +215,13 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
   3. Build GET /api/expenses (get all expenses for user)
   4. Build GET /api/expenses/{id} (get single expense)
   5. Test all endpoints with Thunder Client
-  6. Verify data is saved to PostgreSQL database
+  6. Verify data is saved to PostgreSQL by querying in VS Code explorer
   7. Commit to GitHub with message: "Add expense CRUD endpoints"
 - **Resources:**
   - Spring Web MVC Documentation
   - RESTful API best practices
   - Thunder Client request testing
-- **Deliverable:** ✅ 3 working REST endpoints + GitHub commit + data persisting to PostgreSQL
+- **Deliverable:** ✅ 3 working REST endpoints + GitHub commit + data persisting to PostgreSQL (verified in VS Code)
 
 ---
 
@@ -212,7 +241,7 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
   3. Add category field to Expense with validation
   4. Add @Valid annotation to validate expense data
   5. Test all CRUD operations with Thunder Client
-  6. Verify updates and deletes work in PostgreSQL
+  6. Verify updates and deletes work in PostgreSQL using VS Code explorer
 - **Deliverable:** Full CRUD operations working
 
 ### **June 17-18 (Wednesday-Thursday): User Authentication**
@@ -231,6 +260,7 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
   4. Implement token generation (JWT)
   5. Add security filters to protect endpoints
   6. Test authentication flow with Thunder Client
+  7. Monitor database changes in VS Code PostgreSQL explorer
 - **Resources:**
   - Spring Security in Action
   - JWT Guide (jwt.io)
@@ -252,8 +282,9 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
   4. Build GET /api/expenses/summary?month=6&year=2026 (monthly summary)
   5. Implement expense validation against budget
   6. Test all features with Thunder Client
-  7. Commit to GitHub with message: "Add authentication and budget tracking"
-- **Deliverable:** ✅ Full CRUD + Auth + Budget logic working with PostgreSQL
+  7. Query budget and expense data in VS Code PostgreSQL explorer
+  8. Commit to GitHub with message: "Add authentication and budget tracking"
+- **Deliverable:** ✅ Full CRUD + Auth + Budget logic working with PostgreSQL (visible in VS Code)
 
 ---
 
@@ -347,65 +378,97 @@ This plan guides you through learning Spring Boot, building a budget tracker, an
 
 ---
 
-## **PostgreSQL Setup Summary (Quick Reference)**
+## **VS Code PostgreSQL Integration Setup (Complete Guide)**
 
-### **Installation Steps:**
-1. Download from https://www.postgresql.org/download/
-2. Run installer and follow prompts
-3. Remember the `postgres` password
-4. PostgreSQL runs as background service (auto-starts)
+### **PostgreSQL Extension in VS Code:**
 
-### **Create Database:**
-```sql
-psql -U postgres
-CREATE DATABASE budget_tracker;
-\q
+The **PostgreSQL by Chris Kolkman** extension allows you to:
+- ✅ Manage databases directly in VS Code
+- ✅ Write and execute SQL queries
+- ✅ View tables, columns, and relationships
+- ✅ Monitor data changes in real-time
+- ✅ No need to switch between apps
+
+### **Installation (One-time setup on June 3):**
+1. Open VS Code Extensions (Ctrl+Shift+X / Cmd+Shift+X)
+2. Search: "PostgreSQL"
+3. Install the one by **Chris Kolkman** (most popular)
+4. You'll see a database icon in the left sidebar
+
+### **Creating Connection (First time on June 3):**
+```
+1. Click PostgreSQL icon in sidebar
+2. Click "Create Connection" or "+"
+3. Enter details:
+   - Host: localhost
+   - Port: 5432
+   - User: postgres
+   - Password: [your postgres password]
+   - Database: postgres
+   - SSL: Standard
+4. Click "Save Connection"
+5. You'll see it in the sidebar (should show ✓ Connected)
 ```
 
-### **Spring Boot Configuration (application.properties):**
-```properties
-# PostgreSQL Database Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5432/budget_tracker
-spring.datasource.username=postgres
-spring.datasource.password=YOUR_PASSWORD_HERE
-spring.datasource.driver-class-name=org.postgresql.Driver
-
-# JPA/Hibernate Configuration
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+### **Creating Database in VS Code:**
+```
+1. Right-click on your connection in sidebar
+2. Select "Create Database"
+3. Name: budget_tracker
+4. Database appears in the tree under your connection
+5. Click it to expand and see tables
 ```
 
-### **Verify Connection in Spring Boot:**
-- Create GET /api/health endpoint
-- Test with Thunder Client
-- Check PostgreSQL logs for connection confirmation
-- Query database directly to verify data persistence
+### **Using PostgreSQL Explorer:**
+```
+Your Connection
+├── Databases
+│   ├── postgres (default)
+│   ├── budget_tracker (your app database)
+│       ├── Tables
+│       │   ├── users
+│       │   ├── expenses
+│       │   └── budgets
+│       └── Views
+├── Schemas
+└── Functions
+```
+
+### **Querying Data in VS Code:**
+1. Right-click on a table
+2. Select "Run SELECT" or "Select Top 1000"
+3. Query results open in a new editor
+4. You can write custom SQL queries too
+
+### **Benefits of VS Code Integration:**
+- ✅ Never leave VS Code during development
+- ✅ Instantly verify data was saved
+- ✅ Query results side-by-side with code
+- ✅ Monitor database during testing
+- ✅ Easier debugging of data issues
 
 ---
 
 ## **Development Environment Setup**
 
-### **Your Complete Tech Stack:**
+### **Your Complete Tech Stack (All in VS Code):**
 
-| Component | Tool | Purpose |
-|-----------|------|---------|
-| **IDE** | VS Code | Code editing |
-| **Java Support** | Extension Pack for Java | Java development |
-| **Spring Boot Tools** | Spring Boot Extension Pack | Spring Boot dev tools |
-| **API Testing** | Thunder Client | Test REST endpoints |
-| **Database** | PostgreSQL | Persistent data storage |
-| **Version Control** | Git + GitHub | Track changes |
-| **Build Tool** | Maven (via Spring Boot) | Dependency management |
+| Component | Tool | Purpose | Location |
+|-----------|------|---------|----------|
+| **IDE** | VS Code | Code editing | Main editor |
+| **Java Support** | Extension Pack for Java | Java development | Left sidebar |
+| **Spring Boot Tools** | Spring Boot Extension Pack | Spring Boot dev tools | Command palette |
+| **Database** | PostgreSQL by Chris Kolkman | Manage & query database | Left sidebar |
+| **API Testing** | Thunder Client | Test REST endpoints | Left sidebar |
+| **Build Tool** | Maven (via Spring Boot) | Dependency management | Terminal |
+| **Version Control** | Git | Track changes | Source Control sidebar |
 
 ### **Why This Stack:**
-- ✅ Lightweight and fast (VS Code)
-- ✅ Professional-grade database (PostgreSQL)
-- ✅ All tools integrated in VS Code
-- ✅ No context switching between apps
+- ✅ Everything in one window (no context switching)
+- ✅ Professional-grade tools (PostgreSQL is industry standard)
+- ✅ No need to open external apps
 - ✅ Skills directly transfer to professional environments
-- ✅ Industry-standard setup
+- ✅ Faster workflow and easier debugging
 
 ---
 
@@ -415,15 +478,15 @@ spring.jpa.properties.hibernate.format_sql=true
 1. **30 mins:** Review previous day's notes
 2. **1-1.5 hours:** Learn new concepts (watch tutorials, read docs)
 3. **1-1.5 hours:** Code and implement
-4. **30 mins:** Test and commit changes
+4. **30 mins:** Test endpoints (Thunder Client) + query database (PostgreSQL explorer)
 5. **15 mins:** Document what you learned
 
 ---
 
 ## **Milestones to Track**
 
-- [ ] **June 7:** Working Spring Boot project with PostgreSQL connected
-- [ ] **June 14:** 3 CRUD endpoints for expenses with PostgreSQL
+- [ ] **June 7:** Working Spring Boot project with PostgreSQL connected in VS Code
+- [ ] **June 14:** 3 CRUD endpoints for expenses with PostgreSQL (verified in VS Code)
 - [ ] **June 21:** Complete CRUD + Authentication + Budget logic
 - [ ] **June 27:** Frontend fully connected to backend
 - [ ] **June 30:** Live deployed application with PostgreSQL + documentation
@@ -434,10 +497,30 @@ spring.jpa.properties.hibernate.format_sql=true
 
 1. **If you fall behind:** Don't worry! Just continue with the next topic. You can revisit concepts later.
 2. **If something is confusing:** Stop and ask me! I'm here to explain concepts clearly.
-3. **PostgreSQL Setup:** Takes 30-60 mins on June 3, but worth it. Ask if you hit issues!
+3. **PostgreSQL in VS Code:** Takes 30-60 mins on June 3, but keeps everything organized. Ask if you hit issues!
 4. **Commit daily:** Even small changes. This builds good habits and tracks progress.
-5. **Test frequently:** Use Thunder Client to test endpoints as you build them.
+5. **Test frequently:** Use Thunder Client + PostgreSQL explorer together for debugging.
 6. **Learn by doing:** Reading alone isn't enough. Code along with tutorials.
+
+---
+
+## **Quick Troubleshooting**
+
+### **PostgreSQL Connection Won't Connect in VS Code:**
+- ✅ Check PostgreSQL service is running (should be automatic)
+- ✅ Verify password is correct
+- ✅ Try port 5432 (default)
+- ✅ Check if PostgreSQL installed correctly
+
+### **Can't Create Database:**
+- ✅ Make sure connection shows "✓ Connected"
+- ✅ Right-click on connection name (not the database icon)
+- ✅ Select "Create Database"
+
+### **Tables Not Showing in Explorer:**
+- ✅ Click the refresh icon next to your connection
+- ✅ Make sure Spring Boot app is running
+- ✅ Check Spring Boot console for errors
 
 ---
 
@@ -455,6 +538,7 @@ spring.jpa.properties.hibernate.format_sql=true
 | VS Code | https://code.visualstudio.com |
 | Extension Pack for Java | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack |
 | Spring Boot Extension Pack | https://marketplace.visualstudio.com/items?itemName=Pivotal.vscode-spring-boot |
+| PostgreSQL Extension | https://marketplace.visualstudio.com/items?itemName=ckolkman.vscode-postgres |
 | Thunder Client | https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client |
 | Chart.js | https://www.chartjs.org |
 | Heroku Docs | https://devcenter.heroku.com |
@@ -470,14 +554,14 @@ By June 30, you'll have:
 - ✅ Real-world database design experience with PostgreSQL
 - ✅ Authentication & security knowledge
 - ✅ A full-stack application on GitHub
+- ✅ Professional development workflow in VS Code
 - ✅ A deployed live project with real database
-- ✅ Professional-grade experience for your portfolio
 - ✅ Valuable portfolio piece as a first-year CS student
 
-**You made the right choice going with PostgreSQL. This experience will be invaluable!**
+**You're set up for success with a professional development environment!**
 
 **Good luck! You've got this! 🚀**
 
 ---
 
-**Need help?** Just ask me at any point during the month. I'm here to explain concepts, review code, debug PostgreSQL issues, or help with anything else!
+**Need help?** Just ask me at any point during the month. I'm here to explain concepts, help with VS Code setup, debug PostgreSQL issues, or help with anything else!

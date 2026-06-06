@@ -28,3 +28,16 @@ ADDITIONAL:
 
 Syntax:
 - some requires the use of semicolon at the end of each sql statement
+- annotations matter as they simplify code by doing things automatically.
+
+JPA / HIBERNATE Concepts (Object-relational Mapping):
+- they serve as a tool that automatically converts your JAVA Objects and DATABASE TABLES so you dont have to write SQL queries manually for basic operations
+
+Commonly Used Annotations:
+
+- ENTITY -> a java class that prepresents a table in your databases
+- ID -> this shows the unique or primary key (usually followed by auto-incrementation)
+- ONE-TO-MANY; MANY-TO-ONE -> relationship status (can be between user and application)
+- COLUMN -> customization the properties of a column
+- GENERATEDVALUE -> auto-increment
+- JOINCOLUMN -> foreign key references

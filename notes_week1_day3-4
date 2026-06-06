@@ -1,1 +1,16 @@
+Structured Queury Language:
+- the way we communicate to databases
+- uses clauses to create a statement
 
+Basic Concepts in SQL:
+- SELECT -> choose columns to display
+- FROM -> choose table where you're looking at
+- WHERE -> filter data (rows)
+- GROUP BY -> allows you to group your data's in rows
+- HAVING BY -> filter GROUPED rows (NOT RAW datas)
+- ORDER BY -> allows you to sort your data
+
+ADDITIONAL
+- LIMIT -> allows you to put a specific number of data that will be displayed
+- COUNT -> number of data's that meets the condition specified
+- DISTINCT -> allows you to view a unique value (distinct)

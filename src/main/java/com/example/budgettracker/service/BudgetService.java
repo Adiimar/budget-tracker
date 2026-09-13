@@ -10,7 +10,6 @@ import com.example.budgettracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +27,8 @@ public class BudgetService {
         Budget budget = new Budget();
         budget.setCategory(request.getCategory());
         budget.setLimitAmount(request.getLimitAmount());
+        budget.setStartDate(request.getStartDate());
+        budget.setEndDate(request.getEndDate());
         budget.setUser(user);
         
         Budget savedBudget = budgetRepository.save(budget);
@@ -45,6 +46,8 @@ public class BudgetService {
         
         budget.setCategory(request.getCategory());
         budget.setLimitAmount(request.getLimitAmount());
+        budget.setStartDate(request.getStartDate());
+        budget.setEndDate(request.getEndDate());
         
         Budget updatedBudget = budgetRepository.save(budget);
         return convertToResponse(updatedBudget, budget.getUser().getId());
@@ -55,8 +58,11 @@ public class BudgetService {
     }
     
     private BudgetResponse convertToResponse(Budget budget, Long userId) {
-        LocalDate today = LocalDate.now();
-        BigDecimal spent = expenseRepository.getSumByUserAndMonth(userId, today.getYear(), today.getMonthValue());
+        BigDecimal spent = expenseRepository.getSumByUserAndDateRange(
+                userId,
+                budget.getStartDate(),
+                budget.getEndDate()
+        );
         spent = spent == null ? BigDecimal.ZERO : spent;
         
         return new BudgetResponse(
@@ -64,7 +70,9 @@ public class BudgetService {
                 budget.getCategory(),
                 budget.getLimitAmount(),
                 spent,
-                budget.getUser().getId()
+                budget.getUser().getId(),
+                budget.getStartDate(),
+                budget.getEndDate()
         );
     }
 }

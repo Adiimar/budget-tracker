@@ -41,54 +41,68 @@ const Login = () => {
     }
   };
 
+  const inputClasses =
+    'w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Login</h1>
-        
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-3xl" />
+      <div className="relative bg-zinc-900 rounded-3xl shadow-2xl border border-zinc-800 p-8 w-full max-w-md">
+        <div className="flex justify-center mb-4">
+          <div className="bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl p-3 shadow-lg shadow-orange-500/20">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </div>
+        </div>
+        <h1 className="text-2xl font-bold text-white mb-1 text-center">Welcome back</h1>
+        <p className="text-zinc-500 text-sm text-center mb-6">Log in to your Budget Tracker account</p>
+
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-4 text-sm">
             {error}
           </div>
         )}
-        
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-zinc-400 text-sm font-semibold mb-1.5">Email</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+              className={inputClasses}
               required
             />
           </div>
-          
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
+
+          <div>
+            <label className="block text-zinc-400 text-sm font-semibold mb-1.5">Password</label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+              className={inputClasses}
               required
             />
           </div>
-          
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
           >
+            {loading && <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />}
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        
-        <p className="text-center text-gray-600 mt-4">
+
+        <p className="text-center text-zinc-500 mt-6 text-sm">
           Don't have an account?{' '}
-          <a href="/register" className="text-blue-500 hover:text-blue-600 font-bold">
+          <a href="/register" className="text-orange-400 hover:text-orange-300 font-semibold">
             Register
           </a>
         </p>

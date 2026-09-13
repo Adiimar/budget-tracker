@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { budgetAPI } from '../api/api';
+import { formatCurrency } from '../utils/currency';
 
 const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     category: '',
     limitAmount: '',
+    startDate: '',
+    endDate: '',
   });
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const presetCategories = ['Food', 'Transport', 'Entertainment', 'Utilities', 'Health', 'Shopping', 'Other'];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,14 +24,32 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
     }));
   };
 
+  const handleCategorySelect = (e) => {
+    const { value } = e.target;
+    if (value === '__custom__') {
+      setIsCustomCategory(true);
+      setFormData((prev) => ({ ...prev, category: '' }));
+    } else {
+      setIsCustomCategory(false);
+      setFormData((prev) => ({ ...prev, category: value }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (formData.startDate && formData.endDate && formData.endDate < formData.startDate) {
+      setError('End date must be after start date');
+      return;
+    }
+
     setLoading(true);
 
     try {
       await budgetAPI.create(formData);
-      setFormData({ category: '', limitAmount: '' });
+      setFormData({ category: '', limitAmount: '', startDate: '', endDate: '' });
+      setIsCustomCategory(false);
       setShowForm(false);
       onBudgetDeleted();
     } catch (err) {
@@ -46,34 +70,68 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
     }
   };
 
+  const inputClasses =
+    'w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 text-sm transition-all';
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  };
+
   return (
     <div>
+      {budgets.length === 0 && !showForm && (
+        <div className="text-center py-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-zinc-800 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4l3 3" />
+            </svg>
+          </div>
+          <p className="text-zinc-400 font-medium text-sm">No budgets set</p>
+          <p className="text-zinc-600 text-xs mt-1">Create one to track limits!</p>
+        </div>
+      )}
+
       {budgets.map((budget) => {
         const percentUsed = (budget.spent / budget.limitAmount) * 100;
         const isOverBudget = budget.spent > budget.limitAmount;
+        const barColor = isOverBudget ? 'bg-red-500' : percentUsed > 75 ? 'bg-amber-500' : 'bg-gradient-to-r from-orange-500 to-amber-500';
 
         return (
-          <div key={budget.id} className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex justify-between items-start mb-2">
+          <div key={budget.id} className="mb-3 p-4 bg-zinc-950/60 rounded-2xl border border-zinc-800">
+            <div className="flex justify-between items-start mb-2.5">
               <div>
-                <p className="font-bold text-gray-800">{budget.category}</p>
-                <p className="text-sm text-gray-600">${budget.spent.toFixed(2)} / ${budget.limitAmount.toFixed(2)}</p>
+                <p className="font-semibold text-white text-sm">{budget.category}</p>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  {formatCurrency(budget.spent)} / {formatCurrency(budget.limitAmount)}
+                </p>
+                {budget.startDate && budget.endDate && (
+                  <p className="text-xs text-zinc-600 mt-0.5">
+                    {formatDate(budget.startDate)} – {formatDate(budget.endDate)}
+                  </p>
+                )}
               </div>
               <button
                 onClick={() => handleDelete(budget.id)}
-                className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded text-xs"
+                className="text-zinc-500 hover:text-red-400 transition-colors p-1 rounded-lg hover:bg-red-500/10"
+                aria-label="Delete budget"
               >
-                Delete
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
               </button>
             </div>
-            <div className="w-full bg-gray-300 rounded-full h-2">
+            <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
               <div
-                className={`h-2 rounded-full transition-all ${
-                  isOverBudget ? 'bg-red-500' : percentUsed > 75 ? 'bg-yellow-500' : 'bg-green-500'
-                }`}
+                className={`h-2 rounded-full transition-all duration-500 ${barColor}`}
                 style={{ width: `${Math.min(percentUsed, 100)}%` }}
               />
             </div>
+            {isOverBudget && (
+              <p className="text-xs text-red-400 font-medium mt-1.5">Over budget!</p>
+            )}
           </div>
         );
       })}
@@ -81,48 +139,109 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
       {!showForm ? (
         <button
           onClick={() => setShowForm(true)}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4"
+          className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-2.5 px-4 rounded-xl mt-2 transition-all duration-200 shadow-md shadow-orange-500/20 flex items-center justify-center gap-2"
         >
-          + Add Budget
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Add Budget
         </button>
       ) : (
-        <form onSubmit={handleSubmit} className="mt-4 space-y-3 bg-white p-4 rounded-lg border border-gray-200">
+        <form onSubmit={handleSubmit} className="mt-2 space-y-3 bg-zinc-950/60 p-4 rounded-2xl border border-zinc-800">
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-sm">
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-3 py-2 rounded-lg text-xs">
               {error}
             </div>
           )}
-          <input
-            type="text"
-            name="category"
-            placeholder="Category"
-            value={formData.category}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
-            required
-          />
+          {!isCustomCategory ? (
+            <select
+              name="categorySelect"
+              value={formData.category}
+              onChange={handleCategorySelect}
+              className={inputClasses}
+              required
+            >
+              <option value="" disabled>Select category</option>
+              {presetCategories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+              <option value="__custom__">+ Custom category...</option>
+            </select>
+          ) : (
+            <div className="space-y-1.5">
+              <input
+                type="text"
+                name="category"
+                placeholder="Enter custom category"
+                value={formData.category}
+                onChange={handleChange}
+                className={inputClasses}
+                required
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCustomCategory(false);
+                  setFormData((prev) => ({ ...prev, category: '' }));
+                }}
+                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              >
+                ← Back to preset categories
+              </button>
+            </div>
+          )}
           <input
             type="number"
             name="limitAmount"
-            placeholder="Budget Limit ($)"
+            placeholder="Budget Limit (₱)"
             value={formData.limitAmount}
             onChange={handleChange}
             step="0.01"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+            className={inputClasses}
             required
           />
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-zinc-500 text-xs font-medium mb-1">Start date</label>
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleChange}
+                className={`${inputClasses} [color-scheme:dark]`}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-zinc-500 text-xs font-medium mb-1">End date</label>
+              <input
+                type="date"
+                name="endDate"
+                value={formData.endDate}
+                onChange={handleChange}
+                min={formData.startDate || undefined}
+                className={`${inputClasses} [color-scheme:dark]`}
+                required
+              />
+            </div>
+          </div>
           <div className="flex gap-2">
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 rounded text-sm disabled:opacity-50"
+              className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-3 rounded-lg text-sm disabled:opacity-50 transition-colors"
             >
               {loading ? 'Adding...' : 'Add'}
             </button>
             <button
               type="button"
-              onClick={() => setShowForm(false)}
-              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-3 rounded text-sm"
+              onClick={() => {
+                setShowForm(false);
+                setIsCustomCategory(false);
+              }}
+              className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold py-2 px-3 rounded-lg text-sm transition-colors"
             >
               Cancel
             </button>

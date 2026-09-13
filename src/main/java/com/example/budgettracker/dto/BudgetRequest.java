@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -19,4 +20,10 @@ public class BudgetRequest {
     @NotNull(message = "Limit amount is required")
     @Positive(message = "Limit must be positive")
     private BigDecimal limitAmount;
+    
+    @NotNull(message = "Start date is required")
+    private LocalDate startDate;
+    
+    @NotNull(message = "End date is required")
+    private LocalDate endDate;
 }

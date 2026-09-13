@@ -1,8 +1,8 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { formatCurrency } from '../utils/currency';
 
 const Charts = ({ expenses }) => {
-  // Category breakdown
   const categoryData = expenses.reduce((acc, expense) => {
     const existing = acc.find((item) => item.name === expense.category);
     if (existing) {
@@ -13,7 +13,6 @@ const Charts = ({ expenses }) => {
     return acc;
   }, []);
 
-  // Daily spending trend
   const dateData = expenses
     .reduce((acc, expense) => {
       const date = new Date(expense.date).toLocaleDateString();
@@ -27,13 +26,20 @@ const Charts = ({ expenses }) => {
     }, [])
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
+  const COLORS = ['#f97316', '#f59e0b', '#fb923c', '#fbbf24', '#ea580c', '#d97706', '#fdba74'];
+
+  const tooltipStyle = {
+    backgroundColor: '#18181b',
+    border: '1px solid #27272a',
+    borderRadius: '12px',
+    color: '#fff',
+    fontSize: '13px',
+  };
 
   return (
     <div className="space-y-6">
-      {/* Pie Chart */}
       <div>
-        <h3 className="font-bold text-lg mb-4 text-gray-800">Spending by Category</h3>
+        <h3 className="font-semibold text-sm mb-4 text-zinc-400">Spending by Category</h3>
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>
             <Pie
@@ -41,31 +47,38 @@ const Charts = ({ expenses }) => {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, value }) => `${name}: $${value.toFixed(2)}`}
+              label={({ name, value }) => `${name}: ${formatCurrency(value)}`}
               outerRadius={80}
-              fill="#8884d8"
+              fill="#f97316"
               dataKey="value"
+              stroke="#09090b"
+              strokeWidth={2}
             >
               {categoryData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+            <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={tooltipStyle} />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Line Chart */}
       {dateData.length > 0 && (
         <div>
-          <h3 className="font-bold text-lg mb-4 text-gray-800">Spending Trend</h3>
+          <h3 className="font-semibold text-sm mb-4 text-zinc-400">Spending Trend</h3>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={dateData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" angle={-45} textAnchor="end" height={80} />
-              <YAxis />
-              <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
-              <Line type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={2} />
+              <defs>
+                <linearGradient id="lineGlow" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#f97316" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#f97316" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+              <XAxis dataKey="date" angle={-45} textAnchor="end" height={80} stroke="#71717a" fontSize={12} />
+              <YAxis stroke="#71717a" fontSize={12} />
+              <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={tooltipStyle} />
+              <Line type="monotone" dataKey="amount" stroke="#f97316" strokeWidth={3} dot={{ fill: '#f97316', r: 4 }} activeDot={{ r: 6 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>

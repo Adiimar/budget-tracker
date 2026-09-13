@@ -42,35 +42,41 @@ const ExpenseForm = ({ onExpenseAdded }) => {
     }
   };
 
+  const inputClasses =
+    'w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all';
+
   return (
-    <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
           {error}
         </div>
       )}
 
       <div>
-        <label className="block text-gray-700 text-sm font-bold mb-2">Amount ($)</label>
-        <input
-          type="number"
-          name="amount"
-          value={formData.amount}
-          onChange={handleChange}
-          step="0.01"
-          placeholder="0.00"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-          required
-        />
+        <label className="block text-zinc-400 text-sm font-semibold mb-1.5">Amount (₱)</label>
+        <div className="relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">₱</span>
+          <input
+            type="number"
+            name="amount"
+            value={formData.amount}
+            onChange={handleChange}
+            step="0.01"
+            placeholder="0.00"
+            className={`${inputClasses} pl-8`}
+            required
+          />
+        </div>
       </div>
 
       <div>
-        <label className="block text-gray-700 text-sm font-bold mb-2">Category</label>
+        <label className="block text-zinc-400 text-sm font-semibold mb-1.5">Category</label>
         <select
           name="category"
           value={formData.category}
           onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+          className={inputClasses}
         >
           {categories.map((cat) => (
             <option key={cat} value={cat}>
@@ -81,26 +87,26 @@ const ExpenseForm = ({ onExpenseAdded }) => {
       </div>
 
       <div>
-        <label className="block text-gray-700 text-sm font-bold mb-2">Description</label>
+        <label className="block text-zinc-400 text-sm font-semibold mb-1.5">Description</label>
         <input
           type="text"
           name="description"
           value={formData.description}
           onChange={handleChange}
           placeholder="What did you spend on?"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+          className={inputClasses}
           required
         />
       </div>
 
       <div>
-        <label className="block text-gray-700 text-sm font-bold mb-2">Date</label>
+        <label className="block text-zinc-400 text-sm font-semibold mb-1.5">Date</label>
         <input
           type="date"
           name="date"
           value={formData.date}
           onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+          className={`${inputClasses} [color-scheme:dark]`}
           required
         />
       </div>
@@ -108,8 +114,9 @@ const ExpenseForm = ({ onExpenseAdded }) => {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200 disabled:opacity-50"
+        className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
       >
+        {loading && <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />}
         {loading ? 'Adding...' : 'Add Expense'}
       </button>
     </form>

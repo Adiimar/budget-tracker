@@ -5,12 +5,12 @@ A complete full-stack budget tracking application built with **Spring Boot** as 
 
 ## Features
 
-✅ **User Authentication** - Register & Login with JWT tokens  
-✅ **Expense Management** - Add, view, edit, delete expenses  
-✅ **Budget Tracking** - Set spending limits by category  (could be further enhanced -> e.g for adding sub-category for specific use)
-✅ **Analytics** - Pie charts (category breakdown) and line graphs (track spending trends)  
-✅ **Responsive UI** - Modern design with Tailwind CSS (to be improve)  
-✅ **Real-time Sync** - All data persists to PostgreSQL  
+-> **User Authentication** - Register & Login with JWT tokens  
+-> **Expense Management** - Add, view, edit, delete expenses  
+-> **Budget Tracking** - Set spending limits by category  (could be further enhanced -> e.g for adding sub-category for specific use)
+-> **Analytics** - Pie charts (category breakdown) and line graphs (track spending trends)  
+-> **Responsive UI** - Modern design with Tailwind CSS (to be improve)  
+-> **Real-time Sync** - All data persists to PostgreSQL  
 
 ---
 

@@ -1,15 +1,15 @@
 
 # Budget Tracker - Full Stack App
 
-A complete full-stack budget tracking application built with **Spring Boot** (Backend) and **React** (Frontend).
+A complete full-stack budget tracking application built with **Spring Boot** as backend and **React** for frontend.
 
 ## Features
 
 ✅ **User Authentication** - Register & Login with JWT tokens  
 ✅ **Expense Management** - Add, view, edit, delete expenses  
-✅ **Budget Tracking** - Set spending limits by category  
-✅ **Analytics** - Pie charts (category breakdown) & line graphs (spending trends)  
-✅ **Responsive UI** - Modern design with Tailwind CSS  
+✅ **Budget Tracking** - Set spending limits by category  (could be further enhanced -> e.g for adding sub-category for specific use)
+✅ **Analytics** - Pie charts (category breakdown) and line graphs (track spending trends)  
+✅ **Responsive UI** - Modern design with Tailwind CSS (to be improve)  
 ✅ **Real-time Sync** - All data persists to PostgreSQL  
 
 ---
@@ -22,13 +22,13 @@ A complete full-stack budget tracking application built with **Spring Boot** (Ba
 - Spring Data JPA
 - PostgreSQL
 - JWT Authentication
-- Lombok
+- Lombok #
 
 **Frontend:**
 - React 18
 - React Router
 - Tailwind CSS
-- Axios
+- Axios #
 - Recharts (Charts)
 
 ---
@@ -141,7 +141,7 @@ git checkout full-stack-dev
 
 ---
 
-## ✅ Verify Everything Works
+## Verify Everything Works
 
 1. **Register a new account**:
    - Go to http://localhost:3000/register
@@ -225,7 +225,7 @@ budget-tracker/
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### PostgreSQL Connection Error
 ```
@@ -277,7 +277,7 @@ npm install
 
 ##  Security Notes
 
-**For development only!**
+**Note: For development only**
 
 In production, you should:
 - Use environment variables for sensitive data (database password, JWT secret)
@@ -292,14 +292,14 @@ In production, you should:
 ## What to Learn
 
 By exploring this codebase, you'll understand:
-- ✅ Full-stack web application architecture
-- ✅ Spring Boot REST API design
-- ✅ JWT authentication & authorization
-- ✅ React component lifecycle & state management
-- ✅ Database design & relationships
-- ✅ CORS & API communication
-- ✅ Tailwind CSS for modern UI
-- ✅ Data visualization with Recharts
+- Full-stack web application architecture
+- Spring Boot REST API design
+- JWT authentication & authorization
+- React component lifecycle & state management
+- Database design & relationships
+- CORS & API communication
+- Tailwind CSS for modern UI
+- Data visualization with Recharts
 
 ---
 
@@ -319,9 +319,7 @@ This project is open source and available under the MIT License.
 
 ---
 
-## Congratulations!
-
-You now have a **fully functional full-stack budget tracker application**! 
+You now have a **fully functional full-stack budget tracker application**.
 
 **Next Steps:**
 1. Explore the code to understand how it works

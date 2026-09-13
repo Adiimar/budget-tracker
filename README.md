@@ -1,9 +1,9 @@
 
-# Budget Tracker - Full Stack Application
+# Budget Tracker - Full Stack App
 
 A complete full-stack budget tracking application built with **Spring Boot** (Backend) and **React** (Frontend).
 
-## 🎯 Features
+## Features
 
 ✅ **User Authentication** - Register & Login with JWT tokens  
 ✅ **Expense Management** - Add, view, edit, delete expenses  
@@ -14,7 +14,7 @@ A complete full-stack budget tracking application built with **Spring Boot** (Ba
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 **Backend:**
 - Java 17
@@ -33,7 +33,7 @@ A complete full-stack budget tracking application built with **Spring Boot** (Ba
 
 ---
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before running the app, install:
 
@@ -45,7 +45,7 @@ Before running the app, install:
 
 ---
 
-## 🚀 Quick Start (Local Setup)
+##  Quick Start (Local Setup)
 
 ### Step 1: Clone the Repository
 
@@ -170,7 +170,7 @@ git checkout full-stack-dev
 
 ---
 
-## 🗂️ Project Structure
+##  Project Structure
 
 ```
 budget-tracker/
@@ -203,7 +203,7 @@ budget-tracker/
 
 ---
 
-## 📝 API Endpoints
+##  API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - Register new user
@@ -265,7 +265,7 @@ npm install
 
 ---
 
-## 📚 Learning Resources
+##  Learning Resources
 
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 - [React Documentation](https://react.dev)
@@ -275,9 +275,9 @@ npm install
 
 ---
 
-## 🔒 Security Notes
+##  Security Notes
 
-⚠️ **For development only!**
+**For development only!**
 
 In production, you should:
 - Use environment variables for sensitive data (database password, JWT secret)
@@ -289,7 +289,7 @@ In production, you should:
 
 ---
 
-## 🎓 What You'll Learn
+## What to Learn
 
 By exploring this codebase, you'll understand:
 - ✅ Full-stack web application architecture
@@ -303,7 +303,7 @@ By exploring this codebase, you'll understand:
 
 ---
 
-## 📞 Support
+## Support
 
 If you encounter issues:
 1. Check the **Troubleshooting** section above
@@ -313,13 +313,13 @@ If you encounter issues:
 
 ---
 
-## 📄 License
+## License
 
 This project is open source and available under the MIT License.
 
 ---
 
-## 🎉 Congratulations!
+## Congratulations!
 
 You now have a **fully functional full-stack budget tracker application**! 
 
@@ -329,4 +329,4 @@ You now have a **fully functional full-stack budget tracker application**!
 3. Deploy to a cloud platform (Heroku, Railway, Render)
 4. Add more features (recurring expenses, monthly reports, etc.)
 
-Happy coding! 🚀
+Happy coding! 

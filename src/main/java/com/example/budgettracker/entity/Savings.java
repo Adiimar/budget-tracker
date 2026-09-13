@@ -12,51 +12,45 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "budgets")
+@Table(name = "savings")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Budget {
-    
+public class Savings {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @NotBlank(message = "Category is required")
+
+    @NotNull(message = "Amount is required")
+    @Positive(message = "Amount must be positive")
     @Column(nullable = false)
-    private String category;
-    
-    @NotNull(message = "Limit amount is required")
-    @Positive(message = "Limit must be positive")
+    private BigDecimal amount;
+
+    @NotBlank(message = "Destination is required")
     @Column(nullable = false)
-    private BigDecimal limitAmount;
-    
-    @NotNull(message = "Start date is required")
-    @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
-    
-    @NotNull(message = "End date is required")
-    @Column(name = "end_date", nullable = false)
-    private LocalDate endDate;
-    
+    private String destination;
+
+    // BANK, EWALLET, or CUSTOM - used by the frontend to pick an icon/color
+    @NotBlank(message = "Destination type is required")
+    @Column(name = "destination_type", nullable = false)
+    private String destinationType;
+
+    private String note;
+
+    @NotNull(message = "Date is required")
+    @Column(nullable = false)
+    private LocalDate date;
+
     @ManyToOne(fetch = jakarta.persistence.FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-    
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 }

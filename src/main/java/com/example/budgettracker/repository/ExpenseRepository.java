@@ -20,4 +20,19 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     
     @Query("SELECT e.category, SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND YEAR(e.date) = :year AND MONTH(e.date) = :month GROUP BY e.category")
     List<Object[]> getSumByCategory(@Param("userId") Long userId, @Param("year") int year, @Param("month") int month);
+    
+    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND e.category = :category AND e.date BETWEEN :startDate AND :endDate")
+    BigDecimal getSumByUserAndCategoryAndDateRange(
+            @Param("userId") Long userId,
+            @Param("category") String category,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+    
+    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND e.date BETWEEN :startDate AND :endDate")
+    BigDecimal getSumByUserAndDateRange(
+            @Param("userId") Long userId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 }

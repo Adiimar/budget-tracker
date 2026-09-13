@@ -9,12 +9,12 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BudgetResponse {
+public class SavingsResponse {
     private Long id;
-    private String category;
-    private BigDecimal limitAmount;
-    private BigDecimal spent;
+    private BigDecimal amount;
+    private String destination;
+    private String destinationType;
+    private String note;
+    private LocalDate date;
     private Long userId;
-    private LocalDate startDate;
-    private LocalDate endDate;
 }

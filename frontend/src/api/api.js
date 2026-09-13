@@ -9,7 +9,6 @@ const api = axios.create({
   },
 });
 
-// Add token to requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -42,6 +41,13 @@ export const budgetAPI = {
   getAll: () => api.get('/budgets'),
   update: (id, data) => api.put(`/budgets/${id}`, data),
   delete: (id) => api.delete(`/budgets/${id}`),
+};
+
+export const savingAPI = {
+  create: (data) => api.post('/savings', data),
+  getAll: () => api.get('/savings'),
+  getTotal: () => api.get('/savings/total'),
+  delete: (id) => api.delete(`/savings/${id}`),
 };
 
 export default api;

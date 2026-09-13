@@ -7,9 +7,14 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
   const [formData, setFormData] = useState({
     category: '',
     limitAmount: '',
+    startDate: '',
+    endDate: '',
   });
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const presetCategories = ['Food', 'Transport', 'Entertainment', 'Utilities', 'Health', 'Shopping', 'Other'];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,14 +24,32 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
     }));
   };
 
+  const handleCategorySelect = (e) => {
+    const { value } = e.target;
+    if (value === '__custom__') {
+      setIsCustomCategory(true);
+      setFormData((prev) => ({ ...prev, category: '' }));
+    } else {
+      setIsCustomCategory(false);
+      setFormData((prev) => ({ ...prev, category: value }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (formData.startDate && formData.endDate && formData.endDate < formData.startDate) {
+      setError('End date must be after start date');
+      return;
+    }
+
     setLoading(true);
 
     try {
       await budgetAPI.create(formData);
-      setFormData({ category: '', limitAmount: '' });
+      setFormData({ category: '', limitAmount: '', startDate: '', endDate: '' });
+      setIsCustomCategory(false);
       setShowForm(false);
       onBudgetDeleted();
     } catch (err) {
@@ -49,6 +72,11 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
 
   const inputClasses =
     'w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 text-sm transition-all';
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  };
 
   return (
     <div>
@@ -78,6 +106,11 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
                 <p className="text-xs text-zinc-500 mt-0.5">
                   {formatCurrency(budget.spent)} / {formatCurrency(budget.limitAmount)}
                 </p>
+                {budget.startDate && budget.endDate && (
+                  <p className="text-xs text-zinc-600 mt-0.5">
+                    {formatDate(budget.startDate)} – {formatDate(budget.endDate)}
+                  </p>
+                )}
               </div>
               <button
                 onClick={() => handleDelete(budget.id)}
@@ -121,15 +154,44 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
               {error}
             </div>
           )}
-          <input
-            type="text"
-            name="category"
-            placeholder="Category"
-            value={formData.category}
-            onChange={handleChange}
-            className={inputClasses}
-            required
-          />
+          {!isCustomCategory ? (
+            <select
+              name="categorySelect"
+              value={formData.category}
+              onChange={handleCategorySelect}
+              className={inputClasses}
+              required
+            >
+              <option value="" disabled>Select category</option>
+              {presetCategories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+              <option value="__custom__">+ Custom category...</option>
+            </select>
+          ) : (
+            <div className="space-y-1.5">
+              <input
+                type="text"
+                name="category"
+                placeholder="Enter custom category"
+                value={formData.category}
+                onChange={handleChange}
+                className={inputClasses}
+                required
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCustomCategory(false);
+                  setFormData((prev) => ({ ...prev, category: '' }));
+                }}
+                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              >
+                ← Back to preset categories
+              </button>
+            </div>
+          )}
           <input
             type="number"
             name="limitAmount"
@@ -140,6 +202,31 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
             className={inputClasses}
             required
           />
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-zinc-500 text-xs font-medium mb-1">Start date</label>
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleChange}
+                className={`${inputClasses} [color-scheme:dark]`}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-zinc-500 text-xs font-medium mb-1">End date</label>
+              <input
+                type="date"
+                name="endDate"
+                value={formData.endDate}
+                onChange={handleChange}
+                min={formData.startDate || undefined}
+                className={`${inputClasses} [color-scheme:dark]`}
+                required
+              />
+            </div>
+          </div>
           <div className="flex gap-2">
             <button
               type="submit"
@@ -150,7 +237,10 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
             </button>
             <button
               type="button"
-              onClick={() => setShowForm(false)}
+              onClick={() => {
+                setShowForm(false);
+                setIsCustomCategory(false);
+              }}
               className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold py-2 px-3 rounded-lg text-sm transition-colors"
             >
               Cancel

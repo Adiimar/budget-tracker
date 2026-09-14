@@ -26,7 +26,7 @@ const Charts = ({ expenses }) => {
     }, [])
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const COLORS = ['#f97316', '#f59e0b', '#fb923c', '#fbbf24', '#ea580c', '#d97706', '#fdba74'];
+  const PIE_COLORS = ['#93c5fd', '#bfdbfe', '#60a5fa', '#a5d8ff', '#7dd3fc', '#bae6fd', '#dbeafe'];
 
   const tooltipStyle = {
     backgroundColor: '#18181b',
@@ -36,29 +36,60 @@ const Charts = ({ expenses }) => {
     fontSize: '13px',
   };
 
+  const tooltipItemStyle = {
+    color: '#fff',
+  };
+
+  const tooltipLabelStyle = {
+    color: '#fff',
+  };
+
+  const renderLegend = (props) => {
+    const { payload } = props;
+    return (
+      <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 mt-3 px-2">
+        {payload.map((entry, index) => (
+          <li key={`legend-${index}`} className="flex items-center gap-1.5 text-xs">
+            <span
+              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-zinc-400">
+              {entry.value}: <span className="text-zinc-200 font-medium">{formatCurrency(categoryData[index]?.value || 0)}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h3 className="font-semibold text-sm mb-4 text-zinc-400">Spending by Category</h3>
-        <ResponsiveContainer width="100%" height={250}>
+        <ResponsiveContainer width="100%" height={280}>
           <PieChart>
             <Pie
               data={categoryData}
               cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={({ name, value }) => `${name}: ${formatCurrency(value)}`}
+              cy="45%"
               outerRadius={80}
-              fill="#f97316"
+              fill="#93c5fd"
               dataKey="value"
               stroke="#09090b"
               strokeWidth={2}
             >
               {categoryData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={tooltipStyle} />
+            <Tooltip
+              formatter={(value) => formatCurrency(value)}
+              contentStyle={tooltipStyle}
+              itemStyle={tooltipItemStyle}
+              labelStyle={tooltipLabelStyle}
+            />
+            <Legend content={renderLegend} verticalAlign="bottom" />
           </PieChart>
         </ResponsiveContainer>
       </div>
@@ -70,15 +101,20 @@ const Charts = ({ expenses }) => {
             <LineChart data={dateData}>
               <defs>
                 <linearGradient id="lineGlow" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#f97316" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#f97316" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
               <XAxis dataKey="date" angle={-45} textAnchor="end" height={80} stroke="#71717a" fontSize={12} />
               <YAxis stroke="#71717a" fontSize={12} />
-              <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={tooltipStyle} />
-              <Line type="monotone" dataKey="amount" stroke="#f97316" strokeWidth={3} dot={{ fill: '#f97316', r: 4 }} activeDot={{ r: 6 }} />
+              <Tooltip
+                formatter={(value) => formatCurrency(value)}
+                contentStyle={tooltipStyle}
+                itemStyle={tooltipItemStyle}
+                labelStyle={tooltipLabelStyle}
+              />
+              <Line type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={3} dot={{ fill: '#3b82f6', r: 4 }} activeDot={{ r: 6 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>

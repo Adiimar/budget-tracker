@@ -26,8 +26,8 @@ const ExpenseList = ({ expenses, onExpenseDeleted }) => {
             key={expense.id}
             className="group flex items-center gap-3 bg-zinc-950/60 hover:bg-zinc-800/60 p-3.5 rounded-2xl border border-zinc-800 transition-colors duration-150"
           >
-            <div className={`flex-shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br ${style.gradient} flex items-center justify-center shadow-md`}>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 shadow-inner flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${style.color}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 {style.icon}
               </svg>
             </div>

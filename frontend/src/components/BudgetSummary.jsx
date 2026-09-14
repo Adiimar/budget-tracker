@@ -71,7 +71,7 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
   };
 
   const inputClasses =
-    'w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 text-sm transition-all';
+    'w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 text-sm transition-all';
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -96,7 +96,7 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
       {budgets.map((budget) => {
         const percentUsed = (budget.spent / budget.limitAmount) * 100;
         const isOverBudget = budget.spent > budget.limitAmount;
-        const barColor = isOverBudget ? 'bg-red-500' : percentUsed > 75 ? 'bg-amber-500' : 'bg-gradient-to-r from-orange-500 to-amber-500';
+        const barColor = isOverBudget ? 'bg-red-500' : 'bg-emerald-600';
 
         return (
           <div key={budget.id} className="mb-3 p-4 bg-zinc-950/60 rounded-2xl border border-zinc-800">
@@ -139,7 +139,7 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
       {!showForm ? (
         <button
           onClick={() => setShowForm(true)}
-          className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-2.5 px-4 rounded-xl mt-2 transition-all duration-200 shadow-md shadow-orange-500/20 flex items-center justify-center gap-2"
+          className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-2.5 px-4 rounded-xl mt-2 transition-all duration-200 shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19" />
@@ -231,7 +231,7 @@ const BudgetSummary = ({ budgets, onBudgetDeleted }) => {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-3 rounded-lg text-sm disabled:opacity-50 transition-colors"
+              className="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2 px-3 rounded-lg text-sm disabled:opacity-50 transition-colors"
             >
               {loading ? 'Adding...' : 'Add'}
             </button>

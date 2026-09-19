@@ -36,6 +36,10 @@ public class Savings {
     @Column(name = "destination_type", nullable = false)
     private String destinationType;
 
+    // DEPOSIT (money moved into savings) or WITHDRAWAL (money taken out, e.g. to fund an expense)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'DEPOSIT'")
+    private String type;
+
     private String note;
 
     @NotNull(message = "Date is required")
@@ -52,5 +56,8 @@ public class Savings {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        if (type == null) {
+            type = "DEPOSIT";
+        }
     }
 }

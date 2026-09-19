@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { expenseAPI } from '../api/api';
+import { SAVINGS_PRESETS } from '../utils/SavingsDestination';
 
 const ExpenseForm = ({ onExpenseAdded }) => {
   const [formData, setFormData] = useState({
@@ -7,7 +8,11 @@ const ExpenseForm = ({ onExpenseAdded }) => {
     category: 'Food',
     description: '',
     date: new Date().toISOString().split('T')[0],
+    source: 'BALANCE',
+    savingsDestination: '',
+    savingsDestinationType: '',
   });
+  const [isCustomSavingsDestination, setIsCustomSavingsDestination] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -21,9 +26,41 @@ const ExpenseForm = ({ onExpenseAdded }) => {
     }));
   };
 
+  const handleSourceChange = (source) => {
+    setFormData((prev) => ({
+      ...prev,
+      source,
+      savingsDestination: source === 'BALANCE' ? '' : prev.savingsDestination,
+      savingsDestinationType: source === 'BALANCE' ? '' : prev.savingsDestinationType,
+    }));
+    if (source === 'BALANCE') setIsCustomSavingsDestination(false);
+  };
+
+  const handleSavingsDestinationSelect = (e) => {
+    const { value } = e.target;
+    if (value === '__custom__') {
+      setIsCustomSavingsDestination(true);
+      setFormData((prev) => ({ ...prev, savingsDestination: '', savingsDestinationType: 'CUSTOM' }));
+    } else {
+      const preset = SAVINGS_PRESETS.find((p) => p.name === value);
+      setIsCustomSavingsDestination(false);
+      setFormData((prev) => ({
+        ...prev,
+        savingsDestination: value,
+        savingsDestinationType: preset?.type || 'CUSTOM',
+      }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (formData.source === 'SAVINGS' && !formData.savingsDestination) {
+      setError('Please choose which savings destination to deduct from');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -33,7 +70,11 @@ const ExpenseForm = ({ onExpenseAdded }) => {
         category: 'Food',
         description: '',
         date: new Date().toISOString().split('T')[0],
+        source: 'BALANCE',
+        savingsDestination: '',
+        savingsDestinationType: '',
       });
+      setIsCustomSavingsDestination(false);
       onExpenseAdded();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to add expense');
@@ -43,7 +84,7 @@ const ExpenseForm = ({ onExpenseAdded }) => {
   };
 
   const inputClasses =
-    'w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all';
+    'w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition-all';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -111,10 +152,82 @@ const ExpenseForm = ({ onExpenseAdded }) => {
         />
       </div>
 
+      {/* Deduct from: Balance or Savings */}
+      <div>
+        <label className="block text-zinc-400 text-sm font-semibold mb-1.5">Deduct from</label>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => handleSourceChange('BALANCE')}
+            className={`py-2.5 px-3 rounded-xl text-sm font-semibold transition-all border ${
+              formData.source === 'BALANCE'
+                ? 'bg-emerald-500/15 border-emerald-500 text-emerald-400'
+                : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+            }`}
+          >
+            Remaining Balance
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSourceChange('SAVINGS')}
+            className={`py-2.5 px-3 rounded-xl text-sm font-semibold transition-all border ${
+              formData.source === 'SAVINGS'
+                ? 'bg-blue-500/15 border-blue-500 text-blue-400'
+                : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+            }`}
+          >
+            Savings
+          </button>
+        </div>
+
+        {formData.source === 'SAVINGS' && (
+          <div className="mt-3">
+            {!isCustomSavingsDestination ? (
+              <select
+                value={formData.savingsDestination}
+                onChange={handleSavingsDestinationSelect}
+                className={inputClasses}
+                required
+              >
+                <option value="" disabled>Which savings account?</option>
+                {SAVINGS_PRESETS.map((p) => (
+                  <option key={p.name} value={p.name}>
+                    {p.name} ({p.type === 'BANK' ? 'Bank' : 'E-wallet'})
+                  </option>
+                ))}
+                <option value="__custom__">+ Custom destination...</option>
+              </select>
+            ) : (
+              <div className="space-y-1.5">
+                <input
+                  type="text"
+                  placeholder="Enter destination name"
+                  value={formData.savingsDestination}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, savingsDestination: e.target.value }))}
+                  className={inputClasses}
+                  required
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCustomSavingsDestination(false);
+                    setFormData((prev) => ({ ...prev, savingsDestination: '', savingsDestinationType: '' }));
+                  }}
+                  className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  ← Back to preset destinations
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
+        className="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading && <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />}
         {loading ? 'Adding...' : 'Add Expense'}

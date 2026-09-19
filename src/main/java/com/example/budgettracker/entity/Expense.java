@@ -38,7 +38,18 @@ public class Expense {
     @NotNull(message = "Date is required")
     @Column(nullable = false)
     private LocalDate date;
-    
+
+    // BALANCE (regular remaining budget) or SAVINGS (deducted from a savings destination)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'BALANCE'")
+    private String source;
+
+    // Only set when source = "SAVINGS"
+    @Column(name = "savings_destination")
+    private String savingsDestination;
+
+    @Column(name = "savings_destination_type")
+    private String savingsDestinationType;
+
     @ManyToOne(fetch = jakarta.persistence.FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -53,6 +64,9 @@ public class Expense {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (source == null) {
+            source = "BALANCE";
+        }
     }
     
     @PreUpdate

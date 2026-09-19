@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { expenseAPI, budgetAPI, savingAPI } from '../api/api';
 import ExpenseForm from '../components/ExpenseForm';
@@ -8,34 +8,7 @@ import Charts from '../components/Charts';
 import SavingsSection from '../components/SavingsSection';
 import SavingsChart from '../components/SavingsChart';
 import { formatCurrency } from '../utils/currency';
-
-const StatCard = ({ label, value, accent }) => (
-  <div className="bg-zinc-950/60 border border-zinc-800 rounded-2xl px-4 py-3 flex-1 min-w-[140px]">
-    <p className={`text-xs font-medium ${accent || 'text-zinc-500'}`}>{label}</p>
-    <p className={`text-lg font-bold mt-0.5 ${accent || ''}`}>{value}</p>
-  </div>
-);
-
-const EmptyState = ({ icon, title, subtitle }) => (
-  <div className="text-center py-12">
-    <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-zinc-800 mb-3">
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        {icon}
-      </svg>
-    </div>
-    <p className="text-zinc-400 font-medium">{title}</p>
-    <p className="text-zinc-600 text-sm mt-1">{subtitle}</p>
-  </div>
-);
-
-const CALENDAR_ICON = (
-  <>
-    <rect x="3" y="4" width="18" height="18" rx="2" />
-    <line x1="16" y1="2" x2="16" y2="6" />
-    <line x1="8" y1="2" x2="8" y2="6" />
-    <line x1="3" y1="10" x2="21" y2="10" />
-  </>
-);
+import SavingsWithdrawals from '../components/SavingsWithdrawals';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -48,29 +21,44 @@ const Dashboard = () => {
 
   const userName = localStorage.getItem('userName');
 
-  useEffect(() => { fetchData(); }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const [expenseRes, budgetRes, savingsRes] = await Promise.all([
+      // allSettled: if one request fails, the others still load
+      const [expenseRes, budgetRes, savingsRes] = await Promise.allSettled([
         expenseAPI.getAll(),
         budgetAPI.getAll(),
         savingAPI.getAll(),
       ]);
-      setExpenses(expenseRes.data);
-      setBudgets(budgetRes.data);
-      setSavings(savingsRes.data);
+
+      if (expenseRes.status === 'fulfilled') setExpenses(expenseRes.value.data);
+      if (budgetRes.status === 'fulfilled') setBudgets(budgetRes.value.data);
+      if (savingsRes.status === 'fulfilled') setSavings(savingsRes.value.data);
+
+      [expenseRes, budgetRes, savingsRes].forEach((r) => {
+        if (r.status === 'rejected') {
+          console.error('Fetch failed:', r.reason);
+          const status = r.reason?.response?.status;
+          if (status === 401 || status === 403) {
+            navigate('/login');
+          }
+        }
+      });
     } catch (err) {
       console.error('Error fetching data:', err);
-      if (err.response?.status === 401) navigate('/login');
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleLogout = () => {
-    ['token', 'userId', 'userName'].forEach((key) => localStorage.removeItem(key));
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
     navigate('/login');
   };
 
@@ -78,14 +66,28 @@ const Dashboard = () => {
     setShowExpenseForm(false);
     fetchData();
   };
-
-  const totalSpent = expenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+  
+  // Expenses paid from savings must not reduce the remaining balance
+  const balanceExpenses = expenses.filter((e) => e.source !== 'SAVINGS');
+  const totalSpent = balanceExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
   const totalBudget = budgets.reduce((sum, b) => sum + parseFloat(b.limitAmount || 0), 0);
-  const totalSavings = savings.reduce((sum, s) => sum + parseFloat(s.amount || 0), 0);
-  const remaining = totalBudget - totalSpent - totalSavings;
+  
+  // Money moved into savings leaves the balance (withdrawals don't touch it)
+  const totalMovedToSavings = savings
+    .filter((s) => s.type !== 'WITHDRAWAL')
+    .reduce((sum, s) => sum + parseFloat(s.amount || 0), 0);
+  
+  const remaining = totalBudget - totalSpent - totalMovedToSavings;
+  const totalSavings = savings.reduce(
+    (sum, s) => sum + (s.type === 'WITHDRAWAL' ? -parseFloat(s.amount || 0) : parseFloat(s.amount || 0)),
+    0
+  );
 
   const filteredExpenses = filterDate
-    ? expenses.filter((e) => new Date(e.date).toISOString().split('T')[0] === filterDate)
+    ? expenses.filter((e) => {
+        const expenseDate = new Date(e.date).toISOString().split('T')[0];
+        return expenseDate === filterDate;
+      })
     : expenses;
 
   if (loading) {
@@ -101,10 +103,11 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
+      {/* Header */}
       <header className="border-b border-zinc-900 sticky top-0 z-10 bg-zinc-950/80 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="bg-emerald-700 rounded-xl p-2.5">
+            <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-2.5 shadow-lg shadow-emerald-500/20">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="1" x2="12" y2="23" />
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
@@ -115,7 +118,10 @@ const Dashboard = () => {
               <p className="text-zinc-500 text-sm">Welcome back, {userName}</p>
             </div>
           </div>
-          <button onClick={handleLogout} className="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-medium py-2 px-4 rounded-xl transition-colors duration-150 flex items-center gap-2 text-sm">
+          <button
+            onClick={handleLogout}
+            className="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-medium py-2 px-4 rounded-xl transition-colors duration-150 flex items-center gap-2 text-sm"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
@@ -126,33 +132,54 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Hero balance card */}
         <div className="rounded-3xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8 mb-6">
           <p className="text-zinc-400 text-sm font-medium">Remaining</p>
-          <p className={`text-4xl sm:text-5xl font-bold mt-1 tracking-tight ${remaining < 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+          <p
+            className={`text-4xl sm:text-5xl font-bold mt-1 tracking-tight ${
+              remaining < 0 ? 'text-red-400' : 'text-emerald-400'
+            }`}
+          >
             {formatCurrency(remaining)}
           </p>
           <div className="flex flex-wrap gap-3 mt-6">
-            <StatCard label="Total Budget" value={formatCurrency(totalBudget)} />
-            <StatCard label="Total Spent" value={formatCurrency(totalSpent)} />
-            <StatCard label="Expenses Logged" value={expenses.length} />
-            <StatCard label="Savings" value={formatCurrency(totalSavings)} />
+            <div className="bg-zinc-950/60 border border-zinc-800 rounded-2xl px-4 py-3 flex-1 min-w-[140px]">
+              <p className="text-zinc-500 text-xs font-medium">Total Budget</p>
+              <p className="text-lg font-bold mt-0.5">{formatCurrency(totalBudget)}</p>
+            </div>
+            <div className="bg-zinc-950/60 border border-zinc-800 rounded-2xl px-4 py-3 flex-1 min-w-[140px]">
+              <p className="text-zinc-500 text-xs font-medium">Total Spent</p>
+              <p className="text-lg font-bold mt-0.5">{formatCurrency(totalSpent)}</p>
+            </div>
+            <div className="bg-zinc-950/60 border border-zinc-800 rounded-2xl px-4 py-3 flex-1 min-w-[140px]">
+              <p className="text-zinc-500 text-xs font-medium">Expenses Logged</p>
+              <p className="text-lg font-bold mt-0.5">{expenses.length}</p>
+            </div>
+            <div className="bg-zinc-950/60 border border-zinc-800 rounded-2xl px-4 py-3 flex-1 min-w-[140px]">
+              <p className="text-zinc-500 text-xs font-medium">Savings</p>
+              <p className="text-lg font-bold mt-0.5">{formatCurrency(totalSavings)}</p>
+            </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
+          {/* Left Column - Forms and Lists */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Add Expense */}
+            {/* Add Expense Section */}
             <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6">
               <button
                 onClick={() => setShowExpenseForm(!showExpenseForm)}
                 className={`w-full font-semibold py-3 px-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 ${
-                  showExpenseForm ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700' : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/30'
+                  showExpenseForm
+                    ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                    : 'bg-emerald-700 hover:bg-emerald-600 text-white'
                 }`}
               >
-                {showExpenseForm ? 'Cancel' : (
+                {showExpenseForm ? (
+                  'Cancel'
+                ) : (
                   <>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="12" y1="5" x2="12" y2="19" />
@@ -162,7 +189,11 @@ const Dashboard = () => {
                   </>
                 )}
               </button>
-              <div className={`overflow-hidden transition-all duration-300 ${showExpenseForm ? 'max-h-[600px] opacity-100 mt-5' : 'max-h-0 opacity-0'}`}>
+              <div
+                className={`overflow-hidden transition-all duration-300 ${
+                  showExpenseForm ? 'max-h-[1200px] opacity-100 mt-5' : 'max-h-0 opacity-0'
+                }`}
+              >
                 <ExpenseForm onExpenseAdded={handleExpenseAdded} />
               </div>
             </div>
@@ -174,7 +205,10 @@ const Dashboard = () => {
                 <div className="flex items-center gap-2">
                   <div className="relative">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      {CALENDAR_ICON}
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
                     </svg>
                     <input
                       type="date"
@@ -184,7 +218,10 @@ const Dashboard = () => {
                     />
                   </div>
                   {filterDate && (
-                    <button onClick={() => setFilterDate('')} className="text-xs font-semibold text-zinc-400 hover:text-white bg-zinc-800 hover:bg-zinc-700 px-3 py-2 rounded-xl transition-colors">
+                    <button
+                      onClick={() => setFilterDate('')}
+                      className="text-xs font-semibold text-zinc-400 hover:text-white bg-zinc-800 hover:bg-zinc-700 px-3 py-2 rounded-xl transition-colors"
+                    >
                       Clear
                     </button>
                   )}
@@ -193,22 +230,50 @@ const Dashboard = () => {
               {filteredExpenses.length > 0 ? (
                 <ExpenseList expenses={filteredExpenses} onExpenseDeleted={fetchData} />
               ) : filterDate ? (
-                <EmptyState icon={CALENDAR_ICON} title="No transactions on this date" subtitle="Try a different date, or clear the filter" />
+                <div className="text-center py-12">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-zinc-800 mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                  </div>
+                  <p className="text-zinc-400 font-medium">No transactions on this date</p>
+                  <p className="text-zinc-600 text-sm mt-1">Try a different date, or clear the filter</p>
+                </div>
               ) : (
-                <EmptyState icon={CALENDAR_ICON} title="No expenses yet" subtitle="Add one to get started!" />
+                <div className="text-center py-12">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-zinc-800 mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                  </div>
+                  <p className="text-zinc-400 font-medium">No expenses yet</p>
+                  <p className="text-zinc-600 text-sm mt-1">Add one to get started!</p>
+                </div>
               )}
             </div>
 
-            <SavingsSection savings={savings} remaining={remaining} onSavingsChanged={fetchData} />
+            {/* Savings */}
+              <SavingsSection savings={savings} remaining={remaining} onSavingsChanged={fetchData} />
+
+            {/* Expenses paid from savings */}
+              <SavingsWithdrawals savings={savings} onSavingsChanged={fetchData} />
           </div>
 
-          {/* Right Column */}
+          {/* Right Column - Summary and Charts */}
           <div className="space-y-6">
+            {/* Budget Summary */}
             <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6">
               <h2 className="text-lg font-bold mb-4">Budget Overview</h2>
               <BudgetSummary budgets={budgets} onBudgetDeleted={fetchData} />
             </div>
 
+            {/* Charts */}
             {expenses.length > 0 && (
               <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6">
                 <h2 className="text-lg font-bold mb-4">Statistics</h2>
@@ -216,8 +281,9 @@ const Dashboard = () => {
               </div>
             )}
 
+            {/* Savings Trend */}
             <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6">
-              <h2 className="text-lg font-bold mb-4">Savings Trend</h2>
+              <h2 className="text-lg font-bold mb-4 text-blue-400">Savings Trend</h2>
               <SavingsChart savings={savings} />
             </div>
           </div>

@@ -7,7 +7,8 @@ const SavingsChart = ({ savings }) => {
 
   let running = 0;
   const trendData = sorted.map((s) => {
-    running += parseFloat(s.amount);
+    const signedAmount = s.type === 'WITHDRAWAL' ? -parseFloat(s.amount) : parseFloat(s.amount);
+    running += signedAmount;
     return {
       date: new Date(s.date).toLocaleDateString(),
       total: running,
@@ -49,4 +50,4 @@ const SavingsChart = ({ savings }) => {
   );
 };
 
-export default SavingsChart;    
+export default SavingsChart;

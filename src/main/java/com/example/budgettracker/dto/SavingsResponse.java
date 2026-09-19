@@ -14,6 +14,7 @@ public class SavingsResponse {
     private BigDecimal amount;
     private String destination;
     private String destinationType;
+    private String type;
     private String note;
     private LocalDate date;
     private Long userId;

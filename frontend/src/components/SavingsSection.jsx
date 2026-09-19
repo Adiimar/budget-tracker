@@ -16,6 +16,9 @@ const SavingsSection = ({ savings, remaining, onSavingsChanged }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Withdrawals (expenses paid from savings) are shown in their own card
+  const deposits = savings.filter((s) => s.type !== 'WITHDRAWAL');
+
   const inputClasses =
     'w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 text-sm transition-all';
 
@@ -217,7 +220,7 @@ const SavingsSection = ({ savings, remaining, onSavingsChanged }) => {
         </form>
       )}
 
-      {savings.length === 0 ? (
+      {deposits.length === 0 ? (
         <div className="text-center py-10">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-zinc-800 mb-3">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -231,7 +234,7 @@ const SavingsSection = ({ savings, remaining, onSavingsChanged }) => {
         </div>
       ) : (
         <div className="space-y-2.5">
-          {savings.map((s) => {
+          {deposits.map((s) => {
             const style = getDestinationStyle(s.destinationType);
             return (
               <div

@@ -18,7 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SavingsController {
 
-    private final SavingsService savingService;
+    private final SavingsService savingsService;
     private final JwtUtil jwtUtil;
 
     @PostMapping
@@ -26,7 +26,7 @@ public class SavingsController {
             @Valid @RequestBody SavingsRequest request,
             @RequestHeader("Authorization") String token) {
         Long userId = extractUserIdFromToken(token);
-        SavingsResponse response = savingService.createSaving(userId, request);
+        SavingsResponse response = savingsService.createSaving(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -34,7 +34,7 @@ public class SavingsController {
     public ResponseEntity<List<SavingsResponse>> getSavings(
             @RequestHeader("Authorization") String token) {
         Long userId = extractUserIdFromToken(token);
-        List<SavingsResponse> savings = savingService.getUserSavings(userId);
+        List<SavingsResponse> savings = savingsService.getUserSavings(userId);
         return ResponseEntity.ok(savings);
     }
 
@@ -42,13 +42,13 @@ public class SavingsController {
     public ResponseEntity<Map<String, BigDecimal>> getTotalSavings(
             @RequestHeader("Authorization") String token) {
         Long userId = extractUserIdFromToken(token);
-        BigDecimal total = savingService.getTotalSavings(userId);
+        BigDecimal total = savingsService.getTotalSavings(userId);
         return ResponseEntity.ok(Map.of("total", total));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSaving(@PathVariable Long id) {
-        savingService.deleteSaving(id);
+        savingsService.deleteSaving(id);
         return ResponseEntity.noContent().build();
     }
 

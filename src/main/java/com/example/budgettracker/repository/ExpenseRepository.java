@@ -14,22 +14,25 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByUserId(Long userId);
     List<Expense> findByUserIdAndDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
     List<Expense> findByUserIdAndCategory(Long userId, String category);
-    
-    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND YEAR(e.date) = :year AND MONTH(e.date) = :month")
+
+    // The sums below exclude expenses paid from savings, so they only
+    // count against the budget / remaining balance.
+
+    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND e.source <> 'SAVINGS' AND YEAR(e.date) = :year AND MONTH(e.date) = :month")
     BigDecimal getSumByUserAndMonth(@Param("userId") Long userId, @Param("year") int year, @Param("month") int month);
-    
-    @Query("SELECT e.category, SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND YEAR(e.date) = :year AND MONTH(e.date) = :month GROUP BY e.category")
+
+    @Query("SELECT e.category, SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND e.source <> 'SAVINGS' AND YEAR(e.date) = :year AND MONTH(e.date) = :month GROUP BY e.category")
     List<Object[]> getSumByCategory(@Param("userId") Long userId, @Param("year") int year, @Param("month") int month);
-    
-    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND e.category = :category AND e.date BETWEEN :startDate AND :endDate")
+
+    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND e.source <> 'SAVINGS' AND e.category = :category AND e.date BETWEEN :startDate AND :endDate")
     BigDecimal getSumByUserAndCategoryAndDateRange(
             @Param("userId") Long userId,
             @Param("category") String category,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
-    
-    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND e.date BETWEEN :startDate AND :endDate")
+
+    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND e.source <> 'SAVINGS' AND e.date BETWEEN :startDate AND :endDate")
     BigDecimal getSumByUserAndDateRange(
             @Param("userId") Long userId,
             @Param("startDate") LocalDate startDate,

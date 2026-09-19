@@ -24,6 +24,9 @@ public class SavingsRequest {
     @NotBlank(message = "Destination type is required")
     private String destinationType;
 
+    // Optional - defaults to "DEPOSIT" if not provided
+    private String type;
+
     private String note;
 
     @NotNull(message = "Date is required")

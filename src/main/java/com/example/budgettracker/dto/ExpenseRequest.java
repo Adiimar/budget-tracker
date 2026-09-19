@@ -26,4 +26,11 @@ public class ExpenseRequest {
     
     @NotNull(message = "Date is required")
     private LocalDate date;
+
+    // "BALANCE" or "SAVINGS" - defaults to "BALANCE" if not sent
+    private String source;
+
+    // Required only when source = "SAVINGS"
+    private String savingsDestination;
+    private String savingsDestinationType;
 }

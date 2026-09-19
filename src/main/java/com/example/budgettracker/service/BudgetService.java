@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,12 +59,15 @@ public class BudgetService {
     }
     
     private BudgetResponse convertToResponse(Budget budget, Long userId) {
-        BigDecimal spent = expenseRepository.getSumByUserAndDateRange(
-                userId,
-                budget.getStartDate(),
-                budget.getEndDate()
-        );
-        spent = spent == null ? BigDecimal.ZERO : spent;
+        // Only expenses paid from the balance count toward the budget;
+        // expenses paid from savings are excluded.
+        BigDecimal spent = expenseRepository
+                .findByUserIdAndDateBetween(userId, budget.getStartDate(), budget.getEndDate())
+                .stream()
+                .filter(e -> !"SAVINGS".equalsIgnoreCase(e.getSource()))
+                .map(e -> e.getAmount())
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         
         return new BudgetResponse(
                 budget.getId(),
